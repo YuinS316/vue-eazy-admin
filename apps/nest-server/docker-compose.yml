@@ -1,13 +1,15 @@
 services:
-  nest-container:
-    build:
-      context: ./
-      dockerfile: ./Dockerfile
-    depends_on:
-      - mysql-container
-      - redis-container
-    ports:
-      - '3000:3000'
+  # nest-container:
+  #   build:
+  #     context: ./
+  #     dockerfile: ./Dockerfile
+  #   environment: 
+  #     - RUNNING_ENV=prod
+  #   depends_on:
+  #     - mysql-container
+  #     - redis-container
+  #   ports:
+  #     - '3000:3000'
   mysql-container:
     image: mysql
     environment:

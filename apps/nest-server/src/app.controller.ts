@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Req } from '@nestjs/common';
 import { AppService } from './app.service';
 import { BusinessThrownService } from './common/providers/businessThrown/businessThrown.provider';
 import { ConfigService } from '@nestjs/config';
@@ -28,6 +28,6 @@ export class AppController {
 
   @Get('getConfig')
   config() {
-    return this.configService.get('TEST_VALUE').name;
+    return this.configService.get('TEST_VALUE')?.name;
   }
 }

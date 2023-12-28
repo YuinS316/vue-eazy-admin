@@ -28,12 +28,14 @@ FROM node:18-alpine as production-stage
 
 COPY --from=build-stage /app/dist /app
 COPY --from=build-stage /app/package.json /app/package.json
+COPY --from=build-stage /app/.config /app/.config
+COPY --from=build-stage /app/.config /.config
 
 WORKDIR /app
 
 RUN npm config set registry https://registry.npmmirror.com/
 
-#RUN npm install -g pnpm@8  
+RUN npm install -g cross-env 
 #两个阶段不共用pnpm，而且不知道为什么pnpm安装的大了很多
 
 RUN npm install --prod
@@ -42,4 +44,4 @@ RUN npm install --prod
 EXPOSE 3000
 
 # 启动
-CMD [ "node", "/app/main.js" ]
+CMD ["node", "/app/main.js" ]

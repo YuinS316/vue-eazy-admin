@@ -21,20 +21,24 @@ export class CleanExpireJobService {
     const logDateRegx = /^(\d{4}-\d{2}-\d{2})\.\d+\.json$/;
 
     for (const file of files) {
+      // 忽略非JSON文件
       if (!file.endsWith('.json')) {
-        continue; // 忽略非JSON文件
+        continue;
       }
 
       const match = file.match(logDateRegx);
+      //  忽略非标准格式的日志
       if (!match) {
         continue;
       }
 
       const dateString = match[1];
+      //  忽略当天的日志
       if (dateString === todayString) {
         continue;
       }
 
+      //  删除非当天的日志
       const filePath = join(fileDirectory, file);
       fs.unlinkSync(filePath);
       this.logger.log(`清除过期日志: ${file}`);

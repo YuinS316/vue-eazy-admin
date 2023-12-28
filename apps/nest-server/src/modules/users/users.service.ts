@@ -4,6 +4,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import Redis from 'ioredis';
+import { JwtService } from '@nestjs/jwt';
+import { SignInDto } from './dto/sign-in.dto';
 
 @Injectable()
 export class UsersService {
@@ -15,8 +17,11 @@ export class UsersService {
 
     @Inject('REDIS')
     private redisClient: Redis,
+
+    private jwtService: JwtService,
   ) {}
 
+  //  创建用户
   async create(createUserDto: CreateUserDto) {
     const res = await this.userRepository.save(createUserDto);
     console.log('res save==', res);
@@ -24,10 +29,13 @@ export class UsersService {
   }
 
   async findAll() {
-    console.log('findAll====');
-    this.logger.log({ func: 'findAll' });
-    // return `This action returns all users`;
-    return await this.redisClient.hget('db0', 'test_id');
+    return this.redisClient.hget('db0', 'test_id');
+  }
+
+  async signIn(body: SignInDto) {
+    const payload = { sub: body.userName, extra: 'shit' };
+    const token = await this.jwtService.signAsync(payload);
+    return token;
   }
 
   findOne(id: number) {

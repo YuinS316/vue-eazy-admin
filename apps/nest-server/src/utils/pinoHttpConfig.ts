@@ -18,7 +18,7 @@ export function pinoHttpConfig(): Params {
             }),
           ),
           // 写入日志
-          ...(['error', 'fatal'] as Level[]).map((level) => ({
+          ...(['debug', 'error', 'fatal'] as Level[]).map((level) => ({
             level,
             stream: pino.transport({
               target: 'pino-roll',
@@ -26,7 +26,7 @@ export function pinoHttpConfig(): Params {
                 file: join('logs', dayjs().format('YYYY-MM-DD')),
                 frequency: 'daily',
                 mkdir: true,
-                size: '5m',
+                size: '10m',
                 extension: '.json',
               },
             }),
