@@ -3,7 +3,12 @@ import {
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
+  OneToOne,
+  JoinTable,
+  ManyToMany,
 } from 'typeorm';
+import { Profile } from './profile.entity';
+import { Role } from '@/modules/role/entities/role.entity';
 
 @Entity()
 export class User {
@@ -11,9 +16,16 @@ export class User {
   id?: number;
 
   @Column({
+    unique: true,
     comment: '用户的登录英文名',
   })
   userName: string;
+
+  @Column({
+    select: false,
+    comment: '用户加密后的密码',
+  })
+  password: string;
 
   @CreateDateColumn({
     type: 'timestamp',
@@ -23,7 +35,7 @@ export class User {
 
   @Column({
     comment: '创建人的名字',
-    default: 'system',
+    nullable: true,
   })
   createdBy: string;
 
@@ -35,7 +47,19 @@ export class User {
 
   @Column({
     comment: '修改人的名字',
-    default: 'system',
+    nullable: true,
   })
   updatedBy: string;
+
+  @OneToOne(() => Profile, (profile) => profile.user, {
+    createForeignKeyConstraints: false,
+    cascade: true,
+  })
+  profile: Profile;
+
+  @ManyToMany(() => Role, (role) => role.users, {
+    createForeignKeyConstraints: false,
+  })
+  @JoinTable()
+  roles: Role[];
 }

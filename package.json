@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev:vue": "pnpm -F vue-client dev",
+    "dev:docker": "pnpm -F nest-server docker:setup",
     "dev:nest": "pnpm -F nest-server start:dev"
   },
   "engines": {
@@ -13,5 +14,11 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "await-to-js": "^3.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3"
+  }
 }

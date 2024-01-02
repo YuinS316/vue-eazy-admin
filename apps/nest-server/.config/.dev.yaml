@@ -1,0 +1,24 @@
+MYSQL_CONFIG:
+  name: 'dida-mysql-dev'
+  type: 'mysql'
+  host: 'localhost'
+  port: 3306
+  username: 'root'
+  password: 'dd123456'
+  database: 'dida-dev'
+  timezone: '+08:00'
+  # 这里的命名一定要跟 MongoDB 里面的配置命名区分开
+  entities: 'mysql'
+  synchronize: true
+
+REDIS_CONFIG:
+  host: 'localhost'
+  port: 6379
+  database: 0
+  password: ''
+  # 单位是毫秒,默认是1day = 1000 * 60 * 60 * 24
+  ttl: 86400000
+
+JWT:
+  secret: 'peace and love'
+  expiresIn: '3d'

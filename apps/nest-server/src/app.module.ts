@@ -8,14 +8,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { getConfig } from './utils/config';
 import { UsersModule } from './modules/users/users.module';
-import { TasksModule } from './modules/tasks/tasks.module';
 import { BusinessThrownModule } from './common/providers/businessThrown/businessThrown.module';
 import { DatabaseModule } from './common/providers/database/database.module';
 import { pinoHttpConfig } from './utils/pinoHttpConfig';
 import { JobModule } from './jobs/job.module';
-import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth/jwt-auth.guard';
 import { jwtConfig } from './utils/jwtConfig';
+import { AuthModule } from './modules/auth/auth.module';
+import { RoleModule } from './modules/role/role.module';
+import { PermissionModule } from './modules/permission/permission.module';
 
 @Module({
   imports: [
@@ -38,8 +39,9 @@ import { jwtConfig } from './utils/jwtConfig';
     BusinessThrownModule,
     //  ======== 业务模块 ========
     UsersModule,
-    TasksModule,
     AuthModule,
+    RoleModule,
+    PermissionModule,
   ],
   controllers: [AppController],
   providers: [

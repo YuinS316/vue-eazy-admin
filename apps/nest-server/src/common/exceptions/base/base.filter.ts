@@ -18,7 +18,6 @@ export class BaseFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    console.log(exception.message);
     this.logger.error(exception.message);
 
     response.status(HttpStatus.SERVICE_UNAVAILABLE).json({

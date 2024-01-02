@@ -1,19 +1,15 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
-  @Length(3, 30)
-  @ApiProperty({ example: 'alan' })
+  @IsNotEmpty({ message: '用户名不能为空' })
+  @Length(6, 20, {
+    message: `用户名长度必须大于$constraint1到$constraint2之间，当前传递的值是$value`,
+  })
   userName: string;
 
   @IsString()
-  @Length(6, 30)
-  @ApiProperty({ example: 'ddd123' })
+  @IsNotEmpty({ message: '密码不能为空' })
+  @Length(6, 20, { message: `密码长度必须大于$constraint1到$constraint2之间` })
   password: string;
-
-  @IsString()
-  @Length(6, 30)
-  @ApiProperty({ example: 'ddd123' })
-  confirmPassword: string;
 }

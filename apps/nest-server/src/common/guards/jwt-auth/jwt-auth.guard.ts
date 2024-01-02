@@ -1,13 +1,9 @@
-import {
-  ExecutionContext,
-  Injectable,
-  CanActivate,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable, CanActivate } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from './public.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { BusinessThrownService } from '@/common/providers/businessThrown/businessThrown.provider';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -15,6 +11,7 @@ export class JwtAuthGuard implements CanActivate {
     private reflector: Reflector,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private thrownService: BusinessThrownService,
   ) {}
 
   async canActivate(context: ExecutionContext) {
@@ -31,7 +28,8 @@ export class JwtAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedException();
+      // throw new UnauthorizedException();
+      this.thrownService.throwNoLogin();
     }
 
     try {
@@ -43,7 +41,8 @@ export class JwtAuthGuard implements CanActivate {
       // so that we can access it in our route handlers
       request['user'] = payload;
     } catch {
-      throw new UnauthorizedException();
+      // throw new UnauthorizedException();
+      this.thrownService.throwTokenFail();
     }
     return true;
   }
