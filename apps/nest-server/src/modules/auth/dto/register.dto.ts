@@ -2,13 +2,13 @@ import { IsString, Length } from 'class-validator';
 
 //  注册
 export class RegisterReqDTO {
-  @IsString()
+  @IsString({ message: '用户名必填' })
   @Length(6, 20, {
     message: `用户名长度必须是$constraint1到$constraint2之间`,
   })
   userName: string;
 
-  @IsString()
+  @IsString({ message: '密码必填' })
   @Length(6, 20, {
     message: `密码长度必须是$constraint1到$constraint2之间`,
   })
@@ -16,6 +16,25 @@ export class RegisterReqDTO {
 }
 
 //  登录
-export class LoginReqDTO {}
+export class LoginReqDTO {
+  @IsString({ message: '用户名必填' })
+  @Length(6, 20, {
+    message: `用户名长度必须是$constraint1到$constraint2之间`,
+  })
+  userName: string;
 
-export class LoginResDTO {}
+  @IsString({ message: '密码必填' })
+  @Length(6, 20, {
+    message: `密码长度必须是$constraint1到$constraint2之间`,
+  })
+  password: string;
+
+  @IsString({ message: '验证码必填' })
+  captcha: string;
+}
+
+//  jwt加密的结构
+export class JWTPayload {
+  id: number;
+  userName: string;
+}

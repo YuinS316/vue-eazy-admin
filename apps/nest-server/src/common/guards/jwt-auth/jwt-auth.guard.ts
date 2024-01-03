@@ -1,9 +1,16 @@
-import { ExecutionContext, Injectable, CanActivate } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  CanActivate,
+  Inject,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from './public.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { BusinessThrownService } from '@/common/providers/businessThrown/businessThrown.provider';
+import Redis from 'ioredis';
+import { AuthService } from '@/modules/auth/auth.service';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -12,6 +19,9 @@ export class JwtAuthGuard implements CanActivate {
     private jwtService: JwtService,
     private configService: ConfigService,
     private thrownService: BusinessThrownService,
+    @Inject('REDIS')
+    private redisClient: Redis,
+    private authService: AuthService,
   ) {}
 
   async canActivate(context: ExecutionContext) {
@@ -25,28 +35,55 @@ export class JwtAuthGuard implements CanActivate {
       return true;
     }
 
+    //  header中提取token
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      // throw new UnauthorizedException();
       this.thrownService.throwNoLogin();
     }
 
+    //  校验token与redis是否匹配
+    const payload = await this.validateTokenMatch(token);
+
+    //  延长redis中token的持续时间
+    await this.extendTokenDuration(payload, token);
+
+    request['user'] = payload;
+
+    return true;
+  }
+
+  //  校验token与redis的记录是否匹配
+  private async validateTokenMatch(token: string) {
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get('JWT').secret,
       });
 
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      request['user'] = payload;
-    } catch {
-      // throw new UnauthorizedException();
+      //  校验跟redis中存的的token是否符合
+      const redisKey = this.authService.generateRedisKey(payload);
+      const exsistToken = await this.redisClient.get(redisKey);
+      if (token !== exsistToken) {
+        await this.redisClient.del(redisKey);
+        this.thrownService.throwTokenFail();
+      }
+
+      return payload;
+    } catch (e) {
+      //  这种情况是jwt过期了，而不是redis过期，所以此时无法获取payload
+      //  等redis那边自动过期回收掉即可，或者用户再次登录覆盖掉redis那边的记录
+
       this.thrownService.throwTokenFail();
     }
-    return true;
   }
 
+  //  延长redis中对应token的持续时间
+  async extendTokenDuration(payload: any, token: string) {
+    const redisKey = this.authService.generateRedisKey(payload);
+    await this.redisClient.set(redisKey, token);
+  }
+
+  //  从header中提取token
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] =
       (request.headers as { authorization?: string }).authorization?.split(

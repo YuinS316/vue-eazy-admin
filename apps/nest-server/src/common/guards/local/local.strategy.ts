@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
-import { AuthService } from './auth.service';
+import { AuthService } from '@/modules/auth/auth.service';
 import { BusinessThrownService } from '@/common/providers/businessThrown/businessThrown.provider';
 import { BUSINESS_ERROR_CODE } from '@/common/providers/businessThrown/business.code.enum';
 
@@ -15,7 +15,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(userName: string, password: string): Promise<any> {
-    console.log('validate==', userName, password);
     const user = await this.authSerevice.validateUser(userName, password);
     if (!user) {
       this.thrownService.throwError(BUSINESS_ERROR_CODE.USER_VALID_FAIL);

@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import * as session from 'express-session';
 import { AppModule } from './app.module';
 import { VersioningType, ValidationPipe } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
@@ -6,10 +7,23 @@ import { TransformInterceptor } from '@common/interceptors/transform/transform.i
 import { BaseFilter } from '@common/exceptions/base/base.filter';
 import { HttpFilter } from '@common/exceptions/http/http.filter';
 import { generateDocument } from './utils/genDoc';
+import { getConfig } from '@/utils/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
+  //  session配置
+  const sessionConfig = getConfig('SESSION');
+  app.use(
+    session({
+      ...sessionConfig,
+      rolling: true,
+      resave: false,
+      saveUninitialized: true,
+    }),
+  );
+
+  //  使用pino作为日志输出组件
   app.useLogger(app.get(Logger));
   app.flushLogs();
 
@@ -32,5 +46,7 @@ async function bootstrap() {
   generateDocument(app);
 
   await app.listen(3000);
+
+  console.log(`🚀 bootstrap successfully: http://localhost:3000`);
 }
 bootstrap();
