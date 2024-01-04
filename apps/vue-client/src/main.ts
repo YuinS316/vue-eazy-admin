@@ -1,5 +1,16 @@
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
+import { createApp } from 'vue';
+import App from './App.vue';
+import 'uno.css';
+import { setupStore } from './store';
+import { setupDiscreteApi } from './utils/navie-tools';
+import { setupRouter } from './router';
 
-createApp(App).mount('#app')
+async function bootstrap() {
+  const app = createApp(App);
+  setupStore(app);
+  setupRouter(app);
+  setupDiscreteApi();
+  app.mount('#app');
+}
+
+bootstrap();

@@ -7,6 +7,8 @@ import {
   Request,
   Req,
   Res,
+  HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import * as svgCaptcha from 'svg-captcha';
 import { AuthService } from './auth.service';
@@ -16,7 +18,6 @@ import { LoginReqDTO, RegisterReqDTO } from './dto/register.dto';
 import { UsersService } from '../users/users.service';
 import { LocalGuard } from '@/common/guards/local/local.guard';
 import { BusinessThrownService } from '@/common/providers/businessThrown/businessThrown.provider';
-import { BUSINESS_ERROR_CODE } from '@/common/providers/businessThrown/business.code.enum';
 
 @ApiTags('登录授权相关')
 @Controller('auth')
@@ -76,5 +77,14 @@ export class AuthController {
   @Public()
   testPublic() {
     return 'succcess';
+  }
+
+  @Get('testFail')
+  @Public()
+  testFail() {
+    throw new HttpException(
+      'You do not have permission to access this resource',
+      HttpStatus.FORBIDDEN,
+    );
   }
 }
