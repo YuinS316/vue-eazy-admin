@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => {
       globals: true, // required
       setupFiles: ['vitest-localstorage-mock'],
       mockReset: false,
+      environmentMatchGlobs: [['**/*.dom.spec.ts', 'happy-dom']],
     },
     plugins: [
       vue(),

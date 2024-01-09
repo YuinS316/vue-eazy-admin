@@ -13,15 +13,28 @@ type IMessageOptions = MessageOptions & { key?: string };
 export class IMessage {
   static instance: IMessage;
 
-  private messageMap = new Map<string, MessageReactive>();
-  private timerMap = new Map<string, NodeJS.Timeout>();
+  private readonly messageMap = new Map<string, MessageReactive>();
+
+  //  改成weakmap 可以让 MessageReactive 消失的时候自动gc，省掉手动管理
+  private readonly timerMap = new WeakMap<MessageReactive, NodeJS.Timeout>();
+
+  //  关闭弹窗的回调，因为创建 MessageReactive 后，navie没有提供对应的api修改回调事件，所以要自己管理
+  private readonly leaveCbMap = new WeakMap<MessageReactive, (() => void)[]>();
 
   constructor(private NMessage: MessageProviderInst) {
     if (IMessage.instance) {
       return IMessage.instance;
     }
     IMessage.instance = this;
-    // NMessage.create()
+  }
+
+  //  提供给测试文件检测Map是否清空使用的
+  inspect() {
+    return {
+      messageMap: this.messageMap,
+      timerMap: this.timerMap,
+      leaveCbMap: this.leaveCbMap,
+    };
   }
 
   /**
@@ -49,26 +62,32 @@ export class IMessage {
     }
 
     const { key } = options;
-    const currentMessage = this.messageMap.get(key);
+
+    let currentMessage = this.messageMap.get(key);
     if (currentMessage) {
       currentMessage.type = type;
       currentMessage.content = content;
     } else {
-      this.messageMap.set(
-        key,
-        this.NMessage[type](content, {
-          ...options,
-          duration: 0,
-          onAfterLeave: () => {
-            this.messageMap.delete(key);
-            options.onAfterLeave?.();
-          },
-        }),
-      );
+      currentMessage = this.NMessage[type](content, {
+        ...options,
+        duration: 0,
+        onAfterLeave: () => {
+          this.messageMap.delete(key);
+          const cbs = this.leaveCbMap.get(currentMessage!);
+          if (isArray(cbs)) {
+            cbs.forEach((cb) => cb());
+          }
+        },
+      });
+
+      this.messageMap.set(key, currentMessage);
     }
 
-    //  自己处理带有key的消息的过期时间
-    this.resoveMessage(key, options.duration);
+    //  处理带有key的消息的过期时间
+    this.resolveMessage(key, options.duration);
+
+    //  处理带有key的消息的回调事件
+    this.resolveLeaveCallback(key, options);
   }
 
   /**
@@ -76,12 +95,33 @@ export class IMessage {
    * @param key
    * @param duration
    */
-  resoveMessage(key: string, duration = 5000) {
-    const isExsist = this.timerMap.has(key);
+  resolveMessage(key: string, duration = 5000) {
+    const msgInst = this.messageMap.get(key)!;
+    const isExsist = this.timerMap.has(msgInst);
     if (isExsist) {
-      clearTimeout(this.timerMap.get(key));
+      clearTimeout(this.timerMap.get(msgInst));
     }
-    this.timerMap.set(key, this.destroy(key, duration));
+    this.timerMap.set(msgInst, this.destroy(key, duration));
+  }
+
+  /**
+   * 管理弹窗消失的回调时间
+   * @param key
+   * @param options
+   */
+  resolveLeaveCallback(key: string, options: IMessageOptions) {
+    if (options.onAfterLeave) {
+      const msgInst = this.messageMap.get(key)!;
+
+      const isExsist = this.leaveCbMap.has(msgInst);
+      if (!isExsist) {
+        this.leaveCbMap.set(msgInst, []);
+      }
+
+      const cbs = this.leaveCbMap.get(msgInst)!;
+
+      cbs.push(options.onAfterLeave);
+    }
   }
 
   destroy(key: string, duration = 200) {
@@ -89,9 +129,18 @@ export class IMessage {
       this.messageMap.get(key)?.destroy();
       this.messageMap.delete(key);
 
-      clearTimeout(this.timerMap.get(key));
-      this.timerMap.delete(key);
+      const msgInst = this.messageMap.get(key)!;
+      clearTimeout(this.timerMap.get(msgInst));
+      this.timerMap.delete(msgInst);
     }, duration);
+  }
+
+  destroyAll() {
+    this.messageMap.forEach((_, key) => {
+      this.destroy(key, 0);
+    });
+    this.messageMap.clear();
+    this.NMessage.destroyAll();
   }
 
   loading(
@@ -127,14 +176,6 @@ export class IMessage {
     options: IMessageOptions = {},
   ) {
     this.createMessage('warning', content, options);
-  }
-
-  destroyAll() {
-    this.messageMap.forEach((_, key) => {
-      this.destroy(key, 0);
-    });
-    this.messageMap.clear();
-    this.NMessage.destroyAll();
   }
 }
 
