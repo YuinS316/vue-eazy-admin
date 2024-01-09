@@ -18,6 +18,7 @@ import { LoginReqDTO, RegisterReqDTO } from './dto/register.dto';
 import { UsersService } from '../users/users.service';
 import { LocalGuard } from '@/common/guards/local/local.guard';
 import { BusinessThrownService } from '@/common/providers/businessThrown/businessThrown.provider';
+import { BUSINESS_ERROR_CODE } from '@/common/providers/businessThrown/business.code.enum';
 
 @ApiTags('登录授权相关')
 @Controller('auth')
@@ -41,9 +42,9 @@ export class AuthController {
   @Post('login')
   login(@Request() req, @Body() body: LoginReqDTO) {
     //  校验验证码是否正确
-    // if (req.session?.code?.toLocaleLowerCase() !== body.captcha.toLowerCase()) {
-    //   this.thrownService.throwError(BUSINESS_ERROR_CODE.CAPTCHA_FAIL);
-    // }
+    if (req.session?.code?.toLocaleLowerCase() !== body.captcha.toLowerCase()) {
+      this.thrownService.throwError(BUSINESS_ERROR_CODE.CAPTCHA_FAIL);
+    }
 
     return this.authService.login(req.user);
 

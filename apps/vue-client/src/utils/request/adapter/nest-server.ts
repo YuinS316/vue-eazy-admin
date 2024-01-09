@@ -55,7 +55,8 @@ export function createNestServerRequest() {
       responseInterceptorsCatch(err) {
         const statusCode = err.response.data?.statusCode || 500;
         const message =
-          err.response.data?.message || '抱歉，出现未知错误，请通知管理员处理';
+          err.response.data?.message?.message ||
+          '抱歉，出现未知错误，请通知管理员处理';
         handleHttpException(statusCode, message);
         return err;
       },
