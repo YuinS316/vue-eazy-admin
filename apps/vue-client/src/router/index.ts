@@ -3,7 +3,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { routeMap } from '@/constants';
 import { setupRouterGuards } from './guards';
 
-const basicRoutes: RouteRecordRaw[] = [
+export const basicRoutes: RouteRecordRaw[] = [
   {
     name: 'Login',
     path: routeMap.login,

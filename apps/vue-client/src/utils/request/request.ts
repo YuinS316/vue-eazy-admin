@@ -1,4 +1,4 @@
-import axios, { isAxiosError } from 'axios';
+import axios from 'axios';
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import type { InstanceConfig, RequestConfig } from './types';
 
