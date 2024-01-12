@@ -24,4 +24,8 @@ export interface InstanceConfig<T = AxiosResponse> extends CreateAxiosDefaults {
 //  接口级别的配置
 export interface RequestConfig<T = AxiosResponse> extends AxiosRequestConfig {
   interceptors?: Interceptors<T>;
+  //  是否开启缓存
+  cache?: boolean;
+  //  擦除缓存
+  clearCache?: boolean;
 }

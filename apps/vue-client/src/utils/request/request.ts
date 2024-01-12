@@ -1,13 +1,17 @@
 import axios from 'axios';
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import type { InstanceConfig, RequestConfig } from './types';
+import { Cached } from './cached';
 
 export class Request {
   public instance: AxiosInstance;
   public config: InstanceConfig;
+  public cachedMap: Cached;
 
   constructor(config: InstanceConfig) {
     this.config = config;
+    //  缓存表
+    this.cachedMap = new Cached();
     this.instance = axios.create(config);
     this.setupInterceptors();
   }
@@ -42,15 +46,46 @@ export class Request {
       config = config.interceptors.requestInterceptors(config as any);
 
     return new Promise((resolve, reject) => {
+      //  判断是否开启了缓存
+      if (config?.cache) {
+        const cacheData = this.cachedMap.getItem(config);
+
+        //  cacheData存在，说明已经正在pending
+        if (cacheData !== undefined) {
+          try {
+            return resolve(cacheData);
+          } catch (e) {
+            return reject(e);
+          }
+        }
+      }
+
+      //  擦除缓存
+      if (config?.clearCache) {
+        this.cachedMap.clearItem(config);
+      }
+
       this.instance
         .request<any, T>(config)
         .then((res) => {
           if (config.interceptors?.responseInterceptors)
             res = config.interceptors.responseInterceptors(res);
 
+          if (config?.cache) {
+            this.cachedMap.setItem(config, res, true);
+          }
+
+          if (config?.clearCache) {
+            this.cachedMap.clearItem(config);
+          }
+
           resolve(res);
         })
         .catch((err: any) => {
+          if (config?.cache) {
+            this.cachedMap.setItem(config, err, false);
+          }
+
           reject(err);
         });
     });

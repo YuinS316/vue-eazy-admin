@@ -1,36 +1,25 @@
 import { Request } from '../request';
-import type { AxiosResponse } from 'axios';
+import type { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { NestResSuccess } from './types';
+import { storageLocal } from '@/utils';
+
+//  业务请求
+function handleBusinessRequest(config: InternalAxiosRequestConfig) {
+  const token = storageLocal.getKey('auth');
+  if (token) {
+    config.headers.Authorization = token;
+  }
+
+  return config;
+}
 
 //  处理业务错误响应码
 function handleBusinessResponse(code: number, message: string) {
-  // switch(code) {
-  //   case 100003: {
-  //     window.
-  //     break;
-  //   }
-  //   default: {
-  //     window.$message.info(message);
-  //     break;
-  //   }
-  // }
-
   window.$message.warning(message);
 }
 
 //  处理后端主动抛出的401, 403等错误
 function handleHttpException(statusCode: number, message: string) {
-  // switch (statusCode) {
-  //   case 401:
-  //   case 403: {
-  //     window.$message.error('抱歉，您暂无权限访问');
-  //     break;
-  //   }
-  //   default: {
-  //     window.$message.error(message);
-  //     break;
-  //   }
-  // }
   window.$message.error(message);
 }
 
@@ -40,6 +29,7 @@ export function createNestServerRequest() {
     baseURL: '/api',
     interceptors: {
       requestInterceptors(config) {
+        handleBusinessRequest(config);
         return config;
       },
       responseInterceptors(res) {

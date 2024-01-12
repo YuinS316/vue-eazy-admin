@@ -1,17 +1,35 @@
 import { it, expect, describe, beforeEach } from 'vitest';
 import { mount, VueWrapper } from '@vue/test-utils';
 import { Router, RouterView, createRouter, createWebHistory } from 'vue-router';
-import { basicRoutes } from '..';
 import { setupPermissionGuard } from '../guards/permission';
 import { useAuthStore } from '@/store/modules/auth';
-import Home from '@/views/home/index.vue';
-import Login from '@/views/login/index.vue';
-import NotFound from '@/views/error/404.vue';
+// import Home from '@/views/home/index.vue';
+// import Login from '@/views/login/index.vue';
+// import NotFound from '@/views/error/404.vue';
+import { routeMap } from '@/constants';
 
 describe('router', () => {
   const TestApp = defineComponent({
     render() {
       return h(RouterView, {});
+    },
+  });
+
+  const Home = defineComponent({
+    render() {
+      return h('div');
+    },
+  });
+
+  const Login = defineComponent({
+    render() {
+      return h('div');
+    },
+  });
+
+  const NotFound = defineComponent({
+    render() {
+      return h('div');
     },
   });
 
@@ -22,7 +40,29 @@ describe('router', () => {
 
     router = createRouter({
       history: createWebHistory('/'),
-      routes: basicRoutes,
+      routes: [
+        {
+          name: 'Login',
+          path: routeMap.login,
+          component: Login,
+          meta: {
+            layout: 'empty',
+          },
+        },
+        {
+          name: 'Home',
+          path: routeMap.home,
+          component: Home,
+        },
+        {
+          name: '404',
+          path: routeMap.noPath,
+          component: NotFound,
+          meta: {
+            layout: 'empty',
+          },
+        },
+      ],
     });
   });
 

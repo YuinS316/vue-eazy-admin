@@ -8,7 +8,7 @@ import {
   vi,
 } from 'vitest';
 import { isAxiosError } from 'axios';
-import { mockGetFail, mockGetSuccess, server } from './mock/server';
+import { mockGetFail, mockGetSuccess, mockRandom, server } from './mock/server';
 import { Request } from '../request';
 
 describe('Axios', () => {
@@ -80,6 +80,73 @@ describe('Axios', () => {
       expect(res).toEqual({ data: 'abc' });
       expect(reqFn).toBeCalled();
       expect(resFn).toBeCalled();
+    });
+  });
+
+  describe('test cache', () => {
+    it('should cache work', async () => {
+      mockRandom();
+
+      const fetch = new Request({
+        baseURL: 'http://localhost',
+      });
+
+      const res1 = fetch.get(
+        '/api/random',
+        {},
+        {
+          cache: true,
+        },
+      );
+
+      const res2 = fetch.get(
+        '/api/random',
+        {},
+        {
+          cache: true,
+        },
+      );
+
+      //  这个接口每次调用会返回不同的内容，比如abc0 -> abc1 -> abc2
+      //  如果axios缓存生效，那么每次都只会返回同一个内容
+      expect(res1).resolves.toEqual({ data: 'abc0' });
+      expect(res2).resolves.toEqual({ data: 'abc0' });
+    });
+
+    it('should clearCache work', async () => {
+      mockRandom();
+
+      const fetch = new Request({
+        baseURL: 'http://localhost',
+      });
+
+      const res1 = fetch.get(
+        '/api/random',
+        {},
+        {
+          cache: true,
+        },
+      );
+
+      const res2 = fetch.get(
+        '/api/random',
+        {},
+        {
+          cache: true,
+        },
+      );
+
+      const res3 = fetch.get(
+        '/api/random',
+        {},
+        {
+          clearCache: true,
+        },
+      );
+
+      expect(res1).resolves.toEqual({ data: 'abc0' });
+      expect(res2).resolves.toEqual({ data: 'abc0' });
+      expect(res3).resolves.toEqual({ data: 'abc1' });
     });
   });
 });
