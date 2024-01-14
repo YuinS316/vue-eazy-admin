@@ -11,7 +11,6 @@ export default defineConfig({
     [
       'ez-border',
       {
-        'box-sizing': 'border-box',
         border: '1px solid rgb(224, 224, 230)',
         'border-radius': '3px',
       },
@@ -25,5 +24,6 @@ export default defineConfig({
   shortcuts: [
     ['wh-full', 'w-full h-full'],
     ['f-c-c', 'flex justify-center items-center'],
+    ['ez-border-b', 'border-0 border-b border-b-solid border-b-ezGrey'],
   ],
 });
