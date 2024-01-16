@@ -24,5 +24,8 @@ declare module 'vue-router' {
   interface RouteMeta {
     //  使用的布局，没有的话就默认使用app store中的默认布局
     layout?: string;
+    icon?: string;
+    title?: string;
+    keepAlive?: boolean;
   }
 }

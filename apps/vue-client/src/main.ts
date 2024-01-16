@@ -10,8 +10,8 @@ import { setupRouter } from './router';
 async function bootstrap() {
   const app = createApp(App);
   setupStore(app);
-  setupRouter(app);
   setupDiscreteApi();
+  await setupRouter(app);
   app.mount('#app');
 }
 

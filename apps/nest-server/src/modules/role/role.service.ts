@@ -39,13 +39,11 @@ export class RoleService {
   async getRoleByCode(code: string) {
     const res = await this.roleRepo.findOne({
       where: { code },
-      relations: ['permissions', 'permissions.children'],
+      relations: ['permissions'],
     });
 
     if (res) {
-      res.permissions = res.permissions.filter(
-        (item) => item.parentId === null && item.type === 'menu',
-      );
+      res.permissions = res.permissions.filter((item) => item.type === 'menu');
       return res;
     } else {
       this.thrownService.throwError(BUSINESS_ERROR_CODE.ROLE_NOT_EXSIST);

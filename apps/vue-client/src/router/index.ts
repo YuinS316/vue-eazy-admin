@@ -1,7 +1,13 @@
 import type { App } from 'vue';
+import { to } from 'await-to-js';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import roleApi from '@/api/role';
 import { routeMap } from '@/constants';
 import { setupRouterGuards } from './guards';
+import { Permission } from '@/api/role/model';
+import { isArray } from '@/utils';
+import { MenuItem } from '@/typings/permission';
+import { usePermissionStore } from '@/store/modules/permission';
 
 export const basicRoutes: RouteRecordRaw[] = [
   {
@@ -47,7 +53,72 @@ export const router = createRouter({
   },
 });
 
-export function setupRouter(app: App) {
+export async function setupRouter(app: App) {
+  const [err] = await to(initUserPermission());
+
+  if (err) {
+    console.error(`初始化角色权限路由失败--`, err);
+  }
+
   app.use(router);
   setupRouterGuards(router);
+}
+
+async function initUserPermission() {
+  const res = await roleApi.getRoleByCode('superAdmin');
+
+  const { setMenuTree } = usePermissionStore();
+
+  if (res) {
+    const { permissions } = res;
+
+    setMenuTree(permissions);
+
+    setupRoutes(permissions);
+  }
+}
+
+async function setupRoutes(permissions: Permission[]) {
+  const routeComponents = import.meta.glob('@/views/**/*.vue');
+  const result = permissions
+    .filter((item) => item.path && item.component)
+    .map((item) => buildRouteItem(item));
+
+  result.forEach((item) => {
+    const route: RouteRecordRaw = {
+      ...(item as any),
+      component: routeComponents[item.component!] as any,
+    };
+
+    if (!router.hasRoute(route.name!)) {
+      router.addRoute(route);
+    }
+  });
+
+  return;
+}
+
+/**
+ * 构建路由
+ * @param permission
+ * @returns
+ */
+function buildRouteItem(permission: Permission) {
+  const { code, path, redirect, component, icon, name, layout, keepAlive } =
+    permission;
+
+  const routeItem = {
+    name: code,
+    path,
+    redirect,
+    component,
+    meta: {
+      icon,
+      title: name,
+      layout,
+      keepAlive: !!keepAlive,
+    },
+  };
+
+  return routeItem;
 }

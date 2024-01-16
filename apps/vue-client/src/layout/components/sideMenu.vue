@@ -1,68 +1,41 @@
 <template>
   <div class="h-full">
     <n-menu
-      :options="menuOptions"
+      ref="menuRef"
+      :options="menuTree"
       accordion
       :indent="18"
       :collapsed-icon-size="22"
       :collapsed-width="64"
+      :value="activeKey"
+      @update-value="handleClickMenu"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { MenuOption } from 'naive-ui';
+import { usePermissionStore } from '@/store/modules/permission';
+const permissionStore = usePermissionStore();
+const { menuTree } = storeToRefs(permissionStore);
 
-const menuOptions: MenuOption[] = [
-  {
-    label: '鱼',
-    key: 'fish',
-    children: [
-      {
-        label: '红烧',
-        key: 'braise',
-        children: [
-          {
-            label: '加辣',
-            key: 'spicy',
-          },
-        ],
-      },
-      {
-        label: '清蒸',
-        key: 'steamed',
-        children: [
-          {
-            label: '不要葱',
-            key: 'no-green-onion',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    label: '熊掌',
-    key: 'bear-paw',
+const menuRef = ref();
+const router = useRouter();
+const route = useRoute();
 
-    children: [
-      {
-        label: '保护野生动物',
-        key: 'protect-wild-animals',
-      },
-    ],
-  },
-  {
-    label: '两个都要',
-    key: 'both',
+const activeKey = computed(() => route.name! as string);
 
-    children: [
-      {
-        label: '鱼和熊掌不可兼得',
-        key: 'can-not',
-      },
-    ],
+watch(
+  () => route.path,
+  () => {
+    menuRef.value?.showOption();
   },
-];
+);
+
+function handleClickMenu(_: string, item: any) {
+  if (item.path) {
+    router.push(item.path);
+  }
+}
 </script>
 
 <style scoped></style>

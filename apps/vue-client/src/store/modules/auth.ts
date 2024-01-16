@@ -3,7 +3,7 @@ import { router } from '@/router';
 import { storageLocal } from '@/utils';
 
 export const useAuthStore = defineStore(
-  'authStore',
+  'auth',
   () => {
     const token = ref('');
 
