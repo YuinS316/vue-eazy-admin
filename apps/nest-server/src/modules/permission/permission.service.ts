@@ -1,26 +1,54 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { to } from 'await-to-js';
 import { CreatePermissionDto } from './dto/create-permission.dto';
-import { UpdatePermissionDto } from './dto/update-permission.dto';
+import { Repository } from 'typeorm';
+import { Permission } from './entities/permission.entity';
+import { BusinessThrownService } from '@/common/providers/businessThrown/businessThrown.provider';
 
 @Injectable()
 export class PermissionService {
-  create(createPermissionDto: CreatePermissionDto) {
-    return 'This action adds a new permission';
+  private readonly logger = new Logger(PermissionService.name);
+
+  constructor(
+    @Inject('PERMISSION_REPOSITORY')
+    private permissionRepo: Repository<Permission>,
+    @Inject(BusinessThrownService)
+    private thrownService: BusinessThrownService,
+  ) {}
+
+  async create(createPermissionDto: CreatePermissionDto) {
+    const [err, data] = await to(this.permissionRepo.save(createPermissionDto));
+
+    if (err) {
+      this.logger.error(err);
+    } else {
+      this.logger.log(data);
+    }
+
+    return !err;
   }
 
-  findAll() {
-    return `This action returns all permission`;
-  }
+  async getMenuTree() {
+    const [err, data] = await to(
+      this.permissionRepo.find({
+        where: {
+          type: 'menu',
+          // parentId: null,
+        },
+        order: {
+          order: 'ASC',
+        },
+        relations: ['children'],
+      }),
+    );
 
-  findOne(id: number) {
-    return `This action returns a #${id} permission`;
-  }
+    if (err) {
+      this.logger.error(err);
+      return [];
+    }
 
-  update(id: number, updatePermissionDto: UpdatePermissionDto) {
-    return `This action updates a #${id} permission`;
-  }
+    this.logger.log(data);
 
-  remove(id: number) {
-    return `This action removes a #${id} permission`;
+    return data.filter((item) => item.parentId === null);
   }
 }

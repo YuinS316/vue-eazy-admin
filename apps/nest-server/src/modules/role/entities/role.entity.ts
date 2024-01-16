@@ -21,19 +21,19 @@ export class Role {
   @Column({ unique: true, comment: '角色展示名' })
   name: string;
 
-  @Column({ comment: '角色描述' })
+  @Column({ comment: '角色描述', nullable: true })
   description: string;
 
   @Column({ comment: '是否启用', default: true })
   enable: boolean;
 
-  @Column({ comment: '创建者', nullable: true })
+  @Column({ comment: '创建者' })
   createdBy: string;
 
   @CreateDateColumn({ comment: '创建时间', type: 'timestamp' })
   createdOn: Date;
 
-  @Column({ comment: '最后更新者', nullable: true })
+  @Column({ comment: '最后更新者' })
   updatedBy: string;
 
   @UpdateDateColumn({ comment: '最后更新时间', type: 'timestamp' })

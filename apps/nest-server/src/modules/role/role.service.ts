@@ -1,26 +1,54 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
+import { In, Repository } from 'typeorm';
+import { Role } from './entities/role.entity';
+import { Permission } from '../permission/entities/permission.entity';
+import { BusinessThrownService } from '@/common/providers/businessThrown/businessThrown.provider';
+import { BUSINESS_ERROR_CODE } from '@/common/providers/businessThrown/business.code.enum';
 
 @Injectable()
 export class RoleService {
-  create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
+  constructor(
+    @Inject('ROLE_REPOSITORY')
+    private roleRepo: Repository<Role>,
+    @Inject('PERMISSION_REPOSITORY')
+    private permissionRepo: Repository<Permission>,
+    @Inject(BusinessThrownService)
+    private thrownService: BusinessThrownService,
+  ) {}
+
+  async create(createRoleDto: CreateRoleDto) {
+    const existRole = await this.roleRepo.findOne({
+      where: [{ name: createRoleDto.name }, { code: createRoleDto.code }],
+    });
+
+    //  角色已存在
+    if (existRole) {
+      this.thrownService.throwError(BUSINESS_ERROR_CODE.ROLE_EXSIST);
+      return;
+    }
+
+    const role = this.roleRepo.create(createRoleDto);
+    role.permissions = await this.permissionRepo.find({
+      where: { id: In(createRoleDto.permissionIdList) },
+    });
+
+    return this.roleRepo.save(role);
   }
 
-  findAll() {
-    return `This action returns all role`;
-  }
+  async getRoleByCode(code: string) {
+    const res = await this.roleRepo.findOne({
+      where: { code },
+      relations: ['permissions', 'permissions.children'],
+    });
 
-  findOne(id: number) {
-    return `This action returns a #${id} role`;
-  }
-
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} role`;
+    if (res) {
+      res.permissions = res.permissions.filter(
+        (item) => item.parentId === null && item.type === 'menu',
+      );
+      return res;
+    } else {
+      this.thrownService.throwError(BUSINESS_ERROR_CODE.ROLE_NOT_EXSIST);
+    }
   }
 }

@@ -16,6 +16,12 @@ export const enum BUSINESS_ERROR_CODE {
   USER_VALID_FAIL = 110001,
   //  验证码错误（或者机器人登录，导致session没有携带验证码）
   CAPTCHA_FAIL = 110002,
+
+  //  ====== 角色相关 ======
+  //  角色已存在
+  ROLE_EXSIST = 120000,
+
+  ROLE_NOT_EXSIST = 120001,
 }
 
 export const BUSINESS_ERROR_MESSAGE: {
@@ -32,4 +38,8 @@ export const BUSINESS_ERROR_MESSAGE: {
   110000: '用户已存在',
   110001: '账号或密码错误',
   110002: '验证码错误',
+
+  //  ====== 角色相关 ======
+  120000: '角色已存在',
+  120001: '角色不存在',
 };

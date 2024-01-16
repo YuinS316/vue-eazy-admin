@@ -15,6 +15,9 @@ export class User {
   @PrimaryGeneratedColumn()
   id?: number;
 
+  @Column({ default: true, comment: '是否启用' })
+  enable: boolean;
+
   @Column({
     unique: true,
     comment: '用户的登录英文名',
