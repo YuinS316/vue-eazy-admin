@@ -3,14 +3,16 @@
     <aside class="w-220 h-full">
       <Sidebar></Sidebar>
     </aside>
-    <main class="flex-1 h-full">
-      <div class="h-48 ez-border-b px-12">
-        <n-icon size="18" @click="handleClickCollapse">
-          <SlidersH></SlidersH>
-        </n-icon>
+    <main class="flex-1 h-full flex flex-col">
+      <div class="h-48 ez-border-b px-12 flex-shrink-0">
+        <div class="inline-block cursor-pointer" @click="handleClickCollapse">
+          <n-icon size="18">
+            <SlidersH></SlidersH>
+          </n-icon>
+        </div>
       </div>
 
-      <div class="bg-[#f9f9f9] h-[calc(100%-48px)]">
+      <div class="bg-[#f9f9f9] flex-1 overflow-hidden">
         <n-scrollbar style="max-height: 100%">
           <slot></slot>
         </n-scrollbar>

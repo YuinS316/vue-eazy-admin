@@ -17,10 +17,10 @@ export class LocalGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
 
     // 从请求体中获取用户名和密码
-    const { username, password } = request.body;
+    const { userName, password } = request.body;
 
     // 调用 validate 方法
-    const user = await this.validate(username, password);
+    const user = await this.validate(userName, password);
 
     request['user'] = user;
 

@@ -1,11 +1,15 @@
 import { Permission } from '@/api/role/model';
 import { MenuItem } from '@/typings/permission';
 import { isArray } from '@/utils';
+import { NIcon } from 'naive-ui';
+import * as IconMap from '@vicons/fa';
 
 export const usePermissionStore = defineStore('permission', () => {
   const menuTree = ref<MenuItem[]>([]);
 
-  function setMenuTree(permissions: Permission[]) {
+  const iconOptions = Object.keys(IconMap) as (keyof typeof IconMap)[];
+
+  function setupMenuTree(permissions: Permission[]) {
     const permissionTree = buildPermissionTree(permissions);
     menuTree.value = buildMenuTree(permissionTree);
   }
@@ -49,6 +53,11 @@ export const usePermissionStore = defineStore('permission', () => {
       key: permission.code,
       path: permission.path,
       order: permission.order ?? 0,
+      icon: () =>
+        h(NIcon, null, {
+          default: () =>
+            h(IconMap[(permission.icon || 'Th') as keyof typeof IconMap]),
+        }),
       children: [],
     };
     const children = buildMenuTree(permission.children || []);
@@ -62,6 +71,7 @@ export const usePermissionStore = defineStore('permission', () => {
 
   return {
     menuTree,
-    setMenuTree,
+    setupMenuTree,
+    iconOptions,
   };
 });

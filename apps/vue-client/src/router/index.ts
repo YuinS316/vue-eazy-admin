@@ -5,8 +5,6 @@ import roleApi from '@/api/role';
 import { routeMap } from '@/constants';
 import { setupRouterGuards } from './guards';
 import { Permission } from '@/api/role/model';
-import { isArray } from '@/utils';
-import { MenuItem } from '@/typings/permission';
 import { usePermissionStore } from '@/store/modules/permission';
 
 export const basicRoutes: RouteRecordRaw[] = [
@@ -57,6 +55,7 @@ export async function setupRouter(app: App) {
   const [err] = await to(initUserPermission());
 
   if (err) {
+    window.$message.error('初始化角色权限路由失败');
     console.error(`初始化角色权限路由失败--`, err);
   }
 
@@ -67,12 +66,12 @@ export async function setupRouter(app: App) {
 async function initUserPermission() {
   const res = await roleApi.getRoleByCode('superAdmin');
 
-  const { setMenuTree } = usePermissionStore();
+  const { setupMenuTree } = usePermissionStore();
 
   if (res) {
     const { permissions } = res;
 
-    setMenuTree(permissions);
+    setupMenuTree(permissions);
 
     setupRoutes(permissions);
   }

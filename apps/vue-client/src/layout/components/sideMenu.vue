@@ -5,6 +5,7 @@
       :options="menuTree"
       accordion
       :indent="18"
+      :collapsed="isCollapsed"
       :collapsed-icon-size="22"
       :collapsed-width="64"
       :value="activeKey"
@@ -14,9 +15,13 @@
 </template>
 
 <script setup lang="ts">
+import { useAppStore } from '@/store/modules/app';
 import { usePermissionStore } from '@/store/modules/permission';
 const permissionStore = usePermissionStore();
 const { menuTree } = storeToRefs(permissionStore);
+
+const appStore = useAppStore();
+const { isCollapsed } = storeToRefs(appStore);
 
 const menuRef = ref();
 const router = useRouter();

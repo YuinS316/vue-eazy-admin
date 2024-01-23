@@ -4,4 +4,5 @@ export interface MenuItem {
   path: string | null;
   order: number;
   children?: MenuItem[];
+  icon: any;
 }

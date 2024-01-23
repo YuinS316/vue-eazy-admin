@@ -9,19 +9,21 @@ export const enum BUSINESS_ERROR_CODE {
   //  已过期
   USER_EXPIRED = 100003,
 
+  USER_NOT_EXIST = 100004,
+
   //  ===== 注册/登录 ======
   //  用户已存在
-  USER_EXSIST = 110000,
-  //  账号或密码草错
+  USER_EXIST = 110000,
+  //  账号或密码
   USER_VALID_FAIL = 110001,
   //  验证码错误（或者机器人登录，导致session没有携带验证码）
   CAPTCHA_FAIL = 110002,
 
   //  ====== 角色相关 ======
   //  角色已存在
-  ROLE_EXSIST = 120000,
+  ROLE_EXIST = 120000,
 
-  ROLE_NOT_EXSIST = 120001,
+  ROLE_NOT_EXIST = 120001,
 }
 
 export const BUSINESS_ERROR_MESSAGE: {
@@ -33,6 +35,7 @@ export const BUSINESS_ERROR_MESSAGE: {
   100001: '用户没有登录',
   100002: '用户没有权限',
   100003: 'token已过期',
+  100004: '用户不存在',
 
   //  ===== 用户注册/登录 ======
   110000: '用户已存在',

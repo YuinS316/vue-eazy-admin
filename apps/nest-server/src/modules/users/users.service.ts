@@ -9,6 +9,7 @@ import { Permission } from '../permission/entities/permission.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { BusinessThrownService } from '@/common/providers/businessThrown/businessThrown.provider';
 import { BUSINESS_ERROR_CODE } from '@/common/providers/businessThrown/business.code.enum';
+import { UpdateUserDto } from '@/modules/users/dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -28,11 +29,11 @@ export class UsersService {
   ) {}
 
   async createUser(user: CreateUserDto) {
-    const isExsistUser = await this.findUserByName(user.userName);
+    const isExistUser = await this.findUserByName(user.userName);
 
     //  先校验是否存在用户
-    if (isExsistUser) {
-      this.thrownService.throwError(BUSINESS_ERROR_CODE.USER_EXSIST);
+    if (isExistUser) {
+      this.thrownService.throwError(BUSINESS_ERROR_CODE.USER_EXIST);
       return;
     }
 
@@ -53,10 +54,34 @@ export class UsersService {
     return !err;
   }
 
-  async findUserByName(userName: string) {
+  async updateUser(user: UpdateUserDto) {
+    const isExistUser = await this.userRepo.findOne({
+      where: {
+        id: user.id,
+      },
+    });
+
+    if (!isExistUser) {
+      return null;
+    }
+
+    isExistUser.roles = user.roles;
+    const res = await this.userRepo.save(isExistUser);
+    return res;
+  }
+
+  async findUserById(id: number) {
+    return this.userRepo.findOne({
+      where: { id },
+    });
+  }
+
+  async findUserByName(userName: string, showPassword = false) {
     return this.userRepo.findOne({
       where: { userName },
-      select: ['id', 'userName', 'password'],
+      select: showPassword
+        ? ['id', 'userName', 'password']
+        : ['id', 'userName'],
       relations: {
         profile: true,
         roles: true,
