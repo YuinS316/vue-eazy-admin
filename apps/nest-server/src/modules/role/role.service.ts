@@ -6,8 +6,10 @@ import { Permission } from '../permission/entities/permission.entity';
 import { BusinessThrownService } from '@/common/providers/businessThrown/businessThrown.provider';
 import { BUSINESS_ERROR_CODE } from '@/common/providers/businessThrown/business.code.enum';
 import {
+  AddPermissionToMultipleRolesDto,
+  AddRoleToUsersDto,
+  AllocPermissionsToRoleDto,
   AllocRolesToUserDto,
-  AllocRoleToUsersDto,
 } from '@/modules/role/dto/alloc-user-role.dto';
 import { User } from '@/modules/users/entities/user.entity';
 
@@ -98,10 +100,10 @@ export class RoleService {
   }
 
   /**
-   * 给多个用户添加同个角色
+   * 给多个用户添加单个角色
    * @param dto
    */
-  async allocRoleToMultipleUsers(dto: AllocRoleToUsersDto) {
+  async addRoleToMultipleUsers(dto: AddRoleToUsersDto) {
     const role = await this.roleRepo.findOne({
       where: {
         code: dto.roleCode,
@@ -139,5 +141,83 @@ export class RoleService {
 
     role.users = newUserList;
     return await this.roleRepo.save(role);
+  }
+
+  /**
+   * 给同个角色分配多个权限
+   * @param dto
+   */
+  async allocPermissionsToRole(dto: AllocPermissionsToRoleDto) {
+    const permissionList = await this.permissionRepo.find({
+      where: {
+        code: In(dto.permissionCodeList),
+      },
+    });
+
+    if (permissionList.length !== dto.permissionCodeList.length) {
+      this.thrownService.throwError(BUSINESS_ERROR_CODE.PERMISSION_NOT_EXIST);
+      return;
+    }
+
+    const role = await this.roleRepo.findOne({
+      where: {
+        code: dto.roleCode,
+      },
+    });
+
+    if (!role) {
+      this.thrownService.throwError(BUSINESS_ERROR_CODE.ROLE_NOT_EXIST);
+      return;
+    }
+
+    role.permissions = permissionList;
+    const res = await this.roleRepo.save(role);
+
+    return res;
+  }
+
+  /**
+   * 给多个角色添加单个权限
+   * @param dto
+   */
+  async addPermissionToMultipleRoles(dto: AddPermissionToMultipleRolesDto) {
+    const roleList = await this.roleRepo.find({
+      where: {
+        code: In(dto.roleCodeList),
+      },
+    });
+
+    if (roleList.length !== dto.roleCodeList.length) {
+      this.thrownService.throwError(BUSINESS_ERROR_CODE.ROLE_NOT_EXIST);
+      return;
+    }
+
+    const permission = await this.permissionRepo.findOne({
+      where: {
+        code: dto.permissionCode,
+      },
+      relations: {
+        roles: true,
+      },
+    });
+
+    if (!permission) {
+      this.thrownService.throwError(BUSINESS_ERROR_CODE.PERMISSION_NOT_EXIST);
+      return;
+    }
+
+    const newRoles: Role[] = [];
+    [...permission.roles, ...roleList].forEach((role) => {
+      const isExist = newRoles.find((item) => item.code === role.code);
+      if (!isExist) {
+        newRoles.push(role);
+      }
+    });
+
+    permission.roles = newRoles;
+
+    const res = await this.permissionRepo.save(permission);
+
+    return res;
   }
 }

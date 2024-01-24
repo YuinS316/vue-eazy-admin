@@ -3,8 +3,10 @@ import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { Public } from '@/common/guards/jwt-auth/public.decorator';
 import {
+  AllocPermissionsToRoleDto,
   AllocRolesToUserDto,
-  AllocRoleToUsersDto,
+  AddRoleToUsersDto,
+  AddPermissionToMultipleRolesDto,
 } from '@/modules/role/dto/alloc-user-role.dto';
 import { BUSINESS_ERROR_CODE } from '@common/providers/businessThrown/business.code.enum';
 import { BusinessThrownService } from '@common/providers/businessThrown/businessThrown.provider';
@@ -42,15 +44,35 @@ export class RoleController {
     return res;
   }
 
-  @Post('allocRoleToMultipleUsers')
+  @Post('addRoleToMultipleUsers')
   @Public()
-  async allocRoleToMultipleUsers(
-    @Body() allocRoleToUsersDto: AllocRoleToUsersDto,
-  ) {
-    const res = await this.roleService.allocRoleToMultipleUsers(
+  async addRoleToMultipleUsers(@Body() allocRoleToUsersDto: AddRoleToUsersDto) {
+    const res = await this.roleService.addRoleToMultipleUsers(
       allocRoleToUsersDto,
     );
 
+    return res;
+  }
+
+  @Post('allocPermissionsToRole')
+  @Public()
+  async allocPermissionsToRole(
+    @Body() allocPermissionsToRoleDto: AllocPermissionsToRoleDto,
+  ) {
+    const res = await this.roleService.allocPermissionsToRole(
+      allocPermissionsToRoleDto,
+    );
+    return res;
+  }
+
+  @Post('addPermissionToMultipleRoles')
+  @Public()
+  async addPermissionToMultipleRoles(
+    @Body() addPermissionToMultipleRolesDto: AddPermissionToMultipleRolesDto,
+  ) {
+    const res = await this.roleService.addPermissionToMultipleRoles(
+      addPermissionToMultipleRolesDto,
+    );
     return res;
   }
 }

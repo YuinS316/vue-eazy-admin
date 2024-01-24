@@ -24,6 +24,10 @@ export const enum BUSINESS_ERROR_CODE {
   ROLE_EXIST = 120000,
 
   ROLE_NOT_EXIST = 120001,
+
+  //  ====== 权限资源相关 ======
+  PERMISSION_EXIST = 130000,
+  PERMISSION_NOT_EXIST = 130001,
 }
 
 export const BUSINESS_ERROR_MESSAGE: {
@@ -45,4 +49,8 @@ export const BUSINESS_ERROR_MESSAGE: {
   //  ====== 角色相关 ======
   120000: '角色已存在',
   120001: '角色不存在',
+
+  //  ====== 权限资源相关 ======
+  130000: '权限已存在',
+  130001: '权限不存在',
 };
