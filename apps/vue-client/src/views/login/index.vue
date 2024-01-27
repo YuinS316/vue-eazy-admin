@@ -82,8 +82,11 @@ import Captcha from './components/captcha.vue';
 import authApi from '@/api/auth';
 import { LoginForm } from '@/typings/login';
 import { useLoginInfo } from './hooks';
+import { initUserPermission } from '@/router';
 
 const { setToken, goLogin } = useAuthStore();
+
+// setToken('234234');
 
 const loginForm = ref<LoginForm>({
   userName: '',
@@ -148,8 +151,11 @@ async function serverLogin() {
       saveLoginInfo();
     }
 
+    //  初始化权限
+    await initUserPermission();
+
     const duration = 3000;
-    window.$message.success('登录成功, 3s后跳转至首页', {
+    window.$message.success('登录成功, 即将跳转至首页', {
       key: 'login',
       duration,
       onAfterLeave() {

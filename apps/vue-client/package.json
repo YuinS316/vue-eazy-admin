@@ -14,7 +14,6 @@
     "dayjs": "^1.11.9",
     "naive-ui": "^2.36.0",
     "pinia": "^2.1.7",
-    "pinia-plugin-persistedstate": "^3.2.1",
     "unocss": "^0.58.3",
     "vue": "^3.3.11",
     "vue-router": "^4.2.5"

@@ -2,9 +2,9 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import Redis from 'ioredis';
 import { JwtService } from '@nestjs/jwt';
 import { compareSync } from 'bcryptjs';
-import { JWTPayload } from './dto/register.dto';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
+import { JwtPayload } from '@/types/auth';
 
 @Injectable()
 export class AuthService {
@@ -17,12 +17,7 @@ export class AuthService {
     private readonly userService: UsersService,
   ) {}
 
-  async login(user: User) {
-    const payload: JWTPayload = {
-      id: user.id,
-      userName: user.userName,
-    };
-
+  async login(payload: JwtPayload) {
     const token = this.generateJwtToken(payload);
     await this.setRedisToken(payload, token);
     return token;
@@ -33,17 +28,17 @@ export class AuthService {
    * @param payload
    * @returns
    */
-  generateJwtToken(payload: JWTPayload) {
+  generateJwtToken(payload: JwtPayload) {
     const token = this.jwtService.sign(payload);
     return token;
   }
 
-  async setRedisToken(payload: JWTPayload, token: string) {
+  async setRedisToken(payload: JwtPayload, token: string) {
     const redisKey = this.generateRedisKey(payload);
     return this.redisClient.set(redisKey, token);
   }
 
-  generateRedisKey(payload: JWTPayload) {
+  generateRedisKey(payload: JwtPayload) {
     return `${payload.id}/${payload.userName}`;
   }
 
@@ -62,5 +57,16 @@ export class AuthService {
     }
 
     return null;
+  }
+
+  buildReqUser(user: Omit<User, 'password'>): JwtPayload {
+    const newUser: JwtPayload = {
+      id: user.id,
+      userName: user.userName,
+      currentRoleCode: user.roles?.[0]?.code || '',
+      roleCodeList: user.roles.map((role) => role.code),
+    };
+
+    return newUser;
   }
 }

@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       vue(),
-      VueDevTools(),
+      // VueDevTools(),
       Unocss(),
       AutoImport({
         imports: ['vue', 'vue-router', 'pinia'],

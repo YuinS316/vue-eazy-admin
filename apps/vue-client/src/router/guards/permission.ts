@@ -11,11 +11,10 @@ const whiteList = [routeMap.login, routeMap.noAuth, routeMap.noPath];
  */
 export function setupPermissionGuard(router: Router) {
   router.beforeEach((to) => {
-    const authStore = useAuthStore();
-    const isLogin = authStore.token !== '';
+    const { isLogin } = useAuthStore();
 
     //  没有token的情况，请去登录吧
-    if (!isLogin) {
+    if (!isLogin()) {
       //  白名单就不用管了
       const isInWhiteList = whiteList.includes(to.path);
       if (isInWhiteList) {

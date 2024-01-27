@@ -2,10 +2,12 @@ import type { App } from 'vue';
 import { to } from 'await-to-js';
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import roleApi from '@/api/role';
+import userApi from '@/api/user';
 import { routeMap } from '@/constants';
 import { setupRouterGuards } from './guards';
 import { Permission } from '@/api/role/model';
 import { usePermissionStore } from '@/store/modules/permission';
+import { useAuthStore } from '@/store/modules/auth';
 
 export const basicRoutes: RouteRecordRaw[] = [
   {
@@ -63,8 +65,25 @@ export async function setupRouter(app: App) {
   setupRouterGuards(router);
 }
 
-async function initUserPermission() {
-  const res = await roleApi.getRoleByCode('superAdmin');
+/**
+ * 获取用户对应角色的权限资源
+ * @returns
+ */
+export async function initUserPermission() {
+  const { isLogin, setUser } = useAuthStore();
+
+  //  没有登陆就不要调用
+  if (!isLogin()) {
+    return;
+  }
+
+  //  获取角色详细信息
+  const userDetail = await userApi.getUserDetail();
+
+  setUser(userDetail);
+
+  //  设置权限信息
+  const res = await roleApi.getRoleByCode(userDetail.currentRole.code);
 
   const { setupMenuTree } = usePermissionStore();
 

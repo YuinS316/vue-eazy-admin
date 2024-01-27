@@ -1,13 +1,15 @@
 import { Request } from '../request';
 import type { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { NestResSuccess } from './types';
-import { storageLocal } from '@/utils';
+import { storageLoc } from '@/utils';
 
 //  业务请求
 function handleBusinessRequest(config: InternalAxiosRequestConfig) {
-  const token = storageLocal.getKey('auth');
+  //  启动时，此时pinia还没初始化，所以只能通过localStorage获取
+  const token = storageLoc.pinia.auth.getItem<string>('token');
+
   if (token) {
-    config.headers.Authorization = token;
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
   return config;
@@ -15,6 +17,15 @@ function handleBusinessRequest(config: InternalAxiosRequestConfig) {
 
 //  处理业务错误响应码
 function handleBusinessResponse(code: number, message: string) {
+  // switch(code) {
+  //   case 100001: {
+  //    //  提醒他是否要重新登录
+  //   }
+  //   default: {
+  //     window.$message.warning(message);
+  //     break;
+  //   }
+  // }
   window.$message.warning(message);
 }
 

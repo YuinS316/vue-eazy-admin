@@ -17,6 +17,8 @@ declare global {
     $dialog: DialogProviderInst;
     $loadingBar: LoadingBarApi;
   }
+
+  type Nullable<T> = T | null;
 }
 
 declare module 'vue-router' {

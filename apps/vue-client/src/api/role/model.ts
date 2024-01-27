@@ -11,6 +11,18 @@ export interface GetRoleByCodeResDTO {
   updatedOn: string;
 }
 
+export interface Role {
+  code: string;
+  createdBy: string;
+  createdOn: string;
+  description: string | null;
+  enable: boolean;
+  id: number;
+  name: string;
+  updatedBy: string;
+  updatedOn: string;
+}
+
 export interface Permission {
   children: Permission[];
   code: string;

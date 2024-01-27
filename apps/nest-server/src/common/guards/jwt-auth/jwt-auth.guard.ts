@@ -62,8 +62,8 @@ export class JwtAuthGuard implements CanActivate {
 
       //  校验跟redis中存的的token是否符合
       const redisKey = this.authService.generateRedisKey(payload);
-      const exsistToken = await this.redisClient.get(redisKey);
-      if (token !== exsistToken) {
+      const existToken = await this.redisClient.get(redisKey);
+      if (token !== existToken) {
         await this.redisClient.del(redisKey);
         this.thrownService.throwTokenFail();
       }
@@ -85,10 +85,9 @@ export class JwtAuthGuard implements CanActivate {
 
   //  从header中提取token
   private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] =
-      (request.headers as { authorization?: string }).authorization?.split(
-        ' ',
-      ) ?? [];
+    const authorization =
+      request.headers.authorization || request.headers.Authorization || '';
+    const [type, token] = authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }
 }

@@ -1,16 +1,30 @@
+import { GetUserDetailResDTO } from '@/api/user/model';
 import { routeMap } from '@/constants';
 import { router } from '@/router';
-import { storageLocal } from '@/utils';
+import { storageLoc } from '@/utils';
 
 export const useAuthStore = defineStore(
   'auth',
   () => {
-    const token = ref('');
+    //  ===== token ======
+    const token = ref<Nullable<string>>('');
+
+    function isLogin() {
+      return token.value !== null && token.value !== '';
+    }
 
     function setToken(value: string) {
       token.value = value;
     }
 
+    //  ===== user =====
+    const user = ref<GetUserDetailResDTO | null>(null);
+
+    function setUser(value: any) {
+      user.value = value;
+    }
+
+    //  ===== utils =====
     function goLogin() {
       router.replace({
         path: routeMap.home,
@@ -18,14 +32,20 @@ export const useAuthStore = defineStore(
     }
 
     return {
+      isLogin,
       token,
       setToken,
       goLogin,
+      user,
+      setUser,
     };
   },
   {
     persist: {
-      key: storageLocal.getKey('auth'),
+      storage: storageLoc.pinia.auth,
+      cacheKey: {
+        token: true,
+      },
     },
   },
 );

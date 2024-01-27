@@ -22,7 +22,7 @@ export class LocalGuard implements CanActivate {
     // 调用 validate 方法
     const user = await this.validate(userName, password);
 
-    request['user'] = user;
+    request['user'] = this.authSerevice.buildReqUser(user);
 
     return !!user;
   }

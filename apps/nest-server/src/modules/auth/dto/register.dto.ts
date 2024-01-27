@@ -32,9 +32,3 @@ export class LoginReqDTO {
   @IsString({ message: '验证码必填' })
   captcha: string;
 }
-
-//  jwt加密的结构
-export class JWTPayload {
-  id: number;
-  userName: string;
-}

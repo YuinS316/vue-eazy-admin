@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev:vue": "pnpm -F vue-client dev",
+    "test:vue": "pnpm -F vue-client test",
     "dev:docker": "pnpm -F nest-server docker:setup",
     "dev:nest": "pnpm -F nest-server start:dev"
   },

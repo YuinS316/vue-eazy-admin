@@ -10,6 +10,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { BusinessThrownService } from '@/common/providers/businessThrown/businessThrown.provider';
 import { BUSINESS_ERROR_CODE } from '@/common/providers/businessThrown/business.code.enum';
 import { UpdateUserDto } from '@/modules/users/dto/update-user.dto';
+import { JwtPayload } from '@/types/auth';
+import { GetUserDetailResDTO } from './dto/find-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -70,10 +72,30 @@ export class UsersService {
     return res;
   }
 
-  async findUserById(id: number) {
-    return this.userRepo.findOne({
-      where: { id },
+  async getUserDetail(payload: JwtPayload) {
+    const user = await this.userRepo.findOne({
+      where: {
+        userName: payload.userName,
+      },
+      select: ['id', 'userName', 'enable'],
+      relations: {
+        profile: true,
+        roles: true,
+      },
     });
+
+    const currentRole = await this.roleRepo.findOne({
+      where: {
+        code: payload.currentRoleCode,
+      },
+    });
+
+    const result: GetUserDetailResDTO = {
+      ...user,
+      currentRole,
+    };
+
+    return result;
   }
 
   async findUserByName(userName: string, showPassword = false) {

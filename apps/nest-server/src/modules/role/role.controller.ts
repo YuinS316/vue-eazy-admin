@@ -26,7 +26,6 @@ export class RoleController {
   }
 
   @Get('queryMenuByRole')
-  @Public()
   async getRoleByCode(@Query('code') code: string) {
     const res = await this.roleService.getRoleByCode(code);
     if (!res) {
