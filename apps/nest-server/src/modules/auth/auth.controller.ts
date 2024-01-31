@@ -51,6 +51,12 @@ export class AuthController {
     // return req.user;
   }
 
+  @ApiOperation({ summary: '退出登录' })
+  @Get('logout')
+  logout(@Request() req) {
+    return this.authService.logout(req.user);
+  }
+
   @ApiOperation({ summary: '生成验证码' })
   @Public()
   @Get('captcha')

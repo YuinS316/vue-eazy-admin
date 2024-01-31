@@ -4,6 +4,7 @@ import type {
   DialogProviderInst,
   LoadingBarApi,
 } from 'naive-ui';
+import { IDialog } from '@/utils/navie-tools/setupDialog';
 import { IMessage } from '@/utils/navie-tools/setupMessage';
 
 import 'vue-router';
@@ -14,7 +15,7 @@ declare global {
   interface Window {
     $message: IMessage;
     $notification: NotificationProviderInst;
-    $dialog: DialogProviderInst;
+    $dialog: IDialog;
     $loadingBar: LoadingBarApi;
   }
 

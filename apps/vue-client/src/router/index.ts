@@ -80,19 +80,21 @@ export async function initUserPermission() {
   //  获取角色详细信息
   const userDetail = await userApi.getUserDetail();
 
-  setUser(userDetail);
+  //  可能用户token过期，返回null
+  if (userDetail) {
+    setUser(userDetail);
 
-  //  设置权限信息
-  const res = await roleApi.getRoleByCode(userDetail.currentRole.code);
+    //  设置权限信息
+    const res = await roleApi.getRoleByCode(userDetail.currentRole.code);
 
-  const { setupMenuTree } = usePermissionStore();
+    const { setupMenuTree, setPermissions } = usePermissionStore();
 
-  if (res) {
-    const { permissions } = res;
-
-    setupMenuTree(permissions);
-
-    setupRoutes(permissions);
+    if (res) {
+      const { permissions } = res;
+      setPermissions(permissions);
+      setupMenuTree(permissions);
+      setupRoutes(permissions);
+    }
   }
 }
 

@@ -23,6 +23,11 @@ export class AuthService {
     return token;
   }
 
+  async logout(payload: JwtPayload) {
+    const redisKey = this.generateRedisKey(payload);
+    return this.redisClient.del(redisKey);
+  }
+
   /**
    * jwt生成token
    * @param payload

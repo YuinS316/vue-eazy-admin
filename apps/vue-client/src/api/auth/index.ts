@@ -6,4 +6,8 @@ export default {
     const url = '/auth/login';
     return requset.post<LoginResDTO>(url, body);
   },
+  logout() {
+    const url = '/auth/logout';
+    return requset.get(url);
+  },
 };

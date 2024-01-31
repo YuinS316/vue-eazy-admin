@@ -6,8 +6,13 @@ import * as IconMap from '@vicons/fa';
 
 export const usePermissionStore = defineStore('permission', () => {
   const menuTree = ref<MenuItem[]>([]);
+  const permissionList = ref<Permission[]>([]);
 
   const iconOptions = Object.keys(IconMap) as (keyof typeof IconMap)[];
+
+  function setPermissions(permissions: Permission[]) {
+    permissionList.value = permissions;
+  }
 
   function setupMenuTree(permissions: Permission[]) {
     const permissionTree = buildPermissionTree(permissions);
@@ -73,5 +78,7 @@ export const usePermissionStore = defineStore('permission', () => {
     menuTree,
     setupMenuTree,
     iconOptions,
+    permissionList,
+    setPermissions,
   };
 });

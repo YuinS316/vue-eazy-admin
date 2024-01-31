@@ -4,13 +4,7 @@
       <Sidebar></Sidebar>
     </aside>
     <main class="flex-1 h-full flex flex-col">
-      <div class="h-48 ez-border-b px-12 flex-shrink-0">
-        <div class="inline-block cursor-pointer" @click="handleClickCollapse">
-          <n-icon size="18">
-            <SlidersH></SlidersH>
-          </n-icon>
-        </div>
-      </div>
+      <Header></Header>
 
       <div class="bg-[#f9f9f9] flex-1 overflow-hidden">
         <n-scrollbar style="max-height: 100%">
@@ -22,17 +16,8 @@
 </template>
 
 <script setup lang="ts">
-import { SlidersH } from '@vicons/fa';
 import Sidebar from './sidebar.vue';
-import { useAppStore } from '@/store/modules/app';
-
-const appStore = useAppStore();
-const { setCollapsed } = appStore;
-const { isCollapsed } = storeToRefs(appStore);
-
-function handleClickCollapse() {
-  setCollapsed(!isCollapsed.value);
-}
+import Header from './header.vue';
 </script>
 
 <style scoped></style>

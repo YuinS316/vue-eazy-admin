@@ -1,5 +1,6 @@
 import { createDiscreteApi } from 'naive-ui';
 import { setupMessage } from './setupMessage';
+import { setupDialog } from './setupDialog';
 
 //  navie脱离上下文的api
 export function setupDiscreteApi() {
@@ -12,6 +13,6 @@ export function setupDiscreteApi() {
 
   window.$message = setupMessage(message);
   window.$notification = notification;
-  window.$dialog = dialog;
+  window.$dialog = setupDialog(dialog);
   window.$loadingBar = loadingBar;
 }

@@ -83,8 +83,9 @@ import authApi from '@/api/auth';
 import { LoginForm } from '@/typings/login';
 import { useLoginInfo } from './hooks';
 import { initUserPermission } from '@/router';
+import { goHome } from '@/utils';
 
-const { setToken, goLogin } = useAuthStore();
+const { setToken } = useAuthStore();
 
 // setToken('234234');
 
@@ -159,7 +160,7 @@ async function serverLogin() {
       key: 'login',
       duration,
       onAfterLeave() {
-        goLogin();
+        goHome();
       },
     });
   } else {

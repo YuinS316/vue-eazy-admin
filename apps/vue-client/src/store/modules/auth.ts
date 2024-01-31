@@ -25,17 +25,11 @@ export const useAuthStore = defineStore(
     }
 
     //  ===== utils =====
-    function goLogin() {
-      router.replace({
-        path: routeMap.home,
-      });
-    }
 
     return {
       isLogin,
       token,
       setToken,
-      goLogin,
       user,
       setUser,
     };

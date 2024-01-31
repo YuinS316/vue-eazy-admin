@@ -4,6 +4,6 @@ import { GetUserDetailResDTO } from './model';
 export default {
   getUserDetail() {
     const url = '/user/getUserDetail';
-    return requset.get<GetUserDetailResDTO>(url, {});
+    return requset.get<Nullable<GetUserDetailResDTO>>(url, {});
   },
 };
