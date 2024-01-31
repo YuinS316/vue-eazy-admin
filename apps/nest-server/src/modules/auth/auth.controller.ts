@@ -9,6 +9,7 @@ import {
   Res,
   HttpStatus,
   HttpException,
+  Query,
 } from '@nestjs/common';
 import * as svgCaptcha from 'svg-captcha';
 import { AuthService } from './auth.service';
@@ -47,14 +48,17 @@ export class AuthController {
     }
 
     return this.authService.login(req.user);
-
-    // return req.user;
   }
 
   @ApiOperation({ summary: '退出登录' })
   @Get('logout')
   logout(@Request() req) {
     return this.authService.logout(req.user);
+  }
+
+  @Get('switchRole')
+  switchRole(@Request() req, @Query('roleCode') roleCode: string) {
+    return this.authService.switchRole(req['user'], roleCode);
   }
 
   @ApiOperation({ summary: '生成验证码' })

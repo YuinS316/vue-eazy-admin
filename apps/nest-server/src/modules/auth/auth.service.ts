@@ -5,6 +5,9 @@ import { compareSync } from 'bcryptjs';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { JwtPayload } from '@/types/auth';
+import { BusinessThrownService } from '@/common/providers/businessThrown/businessThrown.provider';
+import { BUSINESS_ERROR_CODE } from '@/common/providers/businessThrown/business.code.enum';
+import { RoleService } from '../role/role.service';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +17,10 @@ export class AuthService {
     @Inject('REDIS')
     private redisClient: Redis,
     private jwtService: JwtService,
+    private readonly roleService: RoleService,
     private readonly userService: UsersService,
+    @Inject(BusinessThrownService)
+    private thrownService: BusinessThrownService,
   ) {}
 
   async login(payload: JwtPayload) {
@@ -26,6 +32,25 @@ export class AuthService {
   async logout(payload: JwtPayload) {
     const redisKey = this.generateRedisKey(payload);
     return this.redisClient.del(redisKey);
+  }
+
+  async switchRole(payload: JwtPayload, roleCode: string) {
+    const user = await this.userService.findUserByName(payload.userName);
+    if (!user) {
+      this.thrownService.throwError(BUSINESS_ERROR_CODE.USER_NOT_EXIST);
+      return;
+    }
+
+    const currentRole = await this.roleService.getRoleByCode(roleCode);
+    if (!currentRole) {
+      this.thrownService.throwError(BUSINESS_ERROR_CODE.ROLE_NOT_EXIST);
+      return;
+    }
+
+    const newUser = this.buildReqUser(user, currentRole.code);
+    const token = await this.login(newUser);
+
+    return token;
   }
 
   /**
@@ -64,11 +89,14 @@ export class AuthService {
     return null;
   }
 
-  buildReqUser(user: Omit<User, 'password'>): JwtPayload {
+  buildReqUser(
+    user: Omit<User, 'password'>,
+    currentRoleCode?: string,
+  ): JwtPayload {
     const newUser: JwtPayload = {
       id: user.id,
       userName: user.userName,
-      currentRoleCode: user.roles?.[0]?.code || '',
+      currentRoleCode: currentRoleCode ?? (user.roles?.[0]?.code || ''),
       roleCodeList: user.roles.map((role) => role.code),
     };
 

@@ -5,4 +5,5 @@ export interface MenuItem {
   order: number;
   children?: MenuItem[];
   icon: any;
+  show?: boolean;
 }

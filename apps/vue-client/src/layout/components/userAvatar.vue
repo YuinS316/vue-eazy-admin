@@ -23,6 +23,8 @@
       </div>
     </div>
   </n-dropdown>
+
+  <RoleSelect ref="roleSelectRef"></RoleSelect>
 </template>
 
 <script setup lang="ts">
@@ -33,6 +35,7 @@ import { NIcon } from 'naive-ui';
 import { DropdownMixedOption } from 'naive-ui/es/dropdown/src/interface';
 import authApi from '@/api/auth';
 import { clearToken, goLogin } from '@/utils';
+import RoleSelect from './roleSelect.vue';
 
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
@@ -45,6 +48,8 @@ const router = useRouter();
 const defaultUrl = `https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg`;
 
 const avatarUrl = computed(() => user.value?.profile?.avatarUrl || defaultUrl);
+
+const roleSelectRef = ref<InstanceType<typeof RoleSelect> | null>();
 
 function renderIcon(icon: Component, props = {}) {
   return () => {
@@ -64,7 +69,7 @@ const hasMultipleRoles = computed(() =>
   user.value !== null ? user.value.roles.length > 1 : false,
 );
 
-const options = ref<DropdownMixedOption[]>([
+const options = computed<DropdownMixedOption[]>(() => [
   {
     label: '个人资料',
     key: 'profile',
@@ -94,13 +99,20 @@ async function handleSelect(key: string) {
     }
 
     case 'switchRole': {
+      roleSelectRef.value?.open();
       break;
     }
 
     case 'logout': {
-      await authApi.logout();
-      clearToken();
-      goLogin();
+      window.$dialog({
+        title: '提示',
+        content: '是否退出登录？',
+        async onPositiveClick() {
+          await authApi.logout();
+          clearToken();
+          goLogin();
+        },
+      });
       break;
     }
 

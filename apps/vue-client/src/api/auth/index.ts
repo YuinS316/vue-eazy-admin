@@ -10,4 +10,8 @@ export default {
     const url = '/auth/logout';
     return requset.get(url);
   },
+  switchRole(roleCode: string) {
+    const url = `/auth/switchRole`;
+    return requset.get<string>(url, { roleCode });
+  },
 };

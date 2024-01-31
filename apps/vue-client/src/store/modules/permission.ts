@@ -64,6 +64,7 @@ export const usePermissionStore = defineStore('permission', () => {
             h(IconMap[(permission.icon || 'Th') as keyof typeof IconMap]),
         }),
       children: [],
+      show: !!permission.show,
     };
     const children = buildMenuTree(permission.children || []);
     children.sort((a, b) => a.order - b.order);
