@@ -16,12 +16,17 @@ export const basicRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/login/index.vue'),
     meta: {
       layout: 'empty',
+      title: '登录',
     },
   },
   {
     name: 'Home',
     path: routeMap.home,
     component: () => import('@/views/home/index.vue'),
+    meta: {
+      layout: 'normal',
+      title: '首页',
+    },
   },
   {
     name: '404',

@@ -28,17 +28,15 @@ export class PermissionService {
     return !err;
   }
 
-  async getMenuTree() {
+  async getMenuPermission() {
     const [err, data] = await to(
       this.permissionRepo.find({
         where: {
           type: 'menu',
-          // parentId: null,
         },
         order: {
           order: 'ASC',
         },
-        relations: ['children'],
       }),
     );
 
@@ -49,6 +47,6 @@ export class PermissionService {
 
     this.logger.log(data);
 
-    return data.filter((item) => item.parentId === null);
+    return data;
   }
 }

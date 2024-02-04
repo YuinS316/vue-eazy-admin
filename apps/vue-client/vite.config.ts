@@ -7,7 +7,12 @@ import Unocss from 'unocss/vite';
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers';
+import {
+  createStyleImportPlugin,
+  VxeTableResolve,
+} from 'vite-plugin-style-import';
 import VueDevTools from 'vite-plugin-vue-devtools';
+import { genPagePathPlugin } from './build/index';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -33,6 +38,10 @@ export default defineConfig(({ mode }) => {
         resolvers: [NaiveUiResolver()],
         dts: './src/typings/components.d.ts',
       }),
+      createStyleImportPlugin({
+        resolves: [VxeTableResolve()],
+      }),
+      genPagePathPlugin(),
     ],
     resolve: {
       alias: {

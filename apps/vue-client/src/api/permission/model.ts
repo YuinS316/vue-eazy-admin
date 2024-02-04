@@ -1,21 +1,7 @@
-export interface GetRoleByCodeResDTO extends RoleEntity {
-  permissions: Permission[];
-}
+export type GetMenuPermissionResDTO = PermissionEntity[];
 
-export interface RoleEntity {
-  code: string;
-  createdBy: string;
-  createdOn: string;
-  description: string | null;
-  enable: boolean;
-  id: number;
-  name: string;
-  updatedBy: string;
-  updatedOn: string;
-}
-
-export interface Permission {
-  children: Permission[];
+export interface PermissionEntity {
+  children: PermissionEntity[];
   code: string;
   component: null | string;
   createdBy: string;

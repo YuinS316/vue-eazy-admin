@@ -8,14 +8,12 @@ export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
 
   @Post()
-  @Public()
   async create(@Body() createPermissionDto: CreatePermissionDto) {
-    return await this.permissionService.create(createPermissionDto);
+    return this.permissionService.create(createPermissionDto);
   }
 
-  @Get('menuTree')
-  @Public()
-  async getMenuTree() {
-    return await this.permissionService.getMenuTree();
+  @Get('getMenuPermission')
+  async getMenuPermission() {
+    return this.permissionService.getMenuPermission();
   }
 }
