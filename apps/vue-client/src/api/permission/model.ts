@@ -22,3 +22,17 @@ export interface PermissionEntity {
   updatedBy: string;
   updatedOn: string;
 }
+
+export interface CreateNewMenuReqDTO {
+  type: 'menu';
+  code: string;
+  name: string;
+  createdBy: string;
+  updatedBy: string;
+  parentId: null | number;
+  path: string;
+  component: string;
+  show: boolean;
+  enable: boolean;
+  order: number;
+}

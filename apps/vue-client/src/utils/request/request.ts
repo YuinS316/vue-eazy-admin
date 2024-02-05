@@ -116,4 +116,17 @@ export class Request {
       ...config,
     });
   }
+
+  delete<T>(
+    url: string,
+    params?: Record<string, any>,
+    config?: RequestConfig<T>,
+  ): Promise<T> {
+    return this.request<T>({
+      url,
+      params,
+      method: 'delete',
+      ...config,
+    });
+  }
 }

@@ -7,10 +7,15 @@
             v-model:value="searchForm.name"
             type="text"
             style="max-width: 300px"
+            clearable
+            placeholder="请输入菜单名称"
           ></n-input>
-          <n-button>搜索</n-button>
+          <n-button @click="getMenuPermission">搜索</n-button>
 
-          <CreateMenuDialog :permissionList="permissionList">
+          <CreateMenuDialog
+            :permissionList="permissionList"
+            @onCreateSuccess="getMenuPermission"
+          >
             <template #default="{ open }">
               <n-button type="primary" @click="open">新增</n-button>
             </template>
@@ -26,7 +31,7 @@
           </div>
         </template>
 
-        <template #operation>
+        <template #operation="{ row }">
           <div class="f-c-c">
             <n-button ghost :size="'tiny'">
               <template #icon>
@@ -36,7 +41,12 @@
 
             <n-divider vertical />
 
-            <n-button type="error" ghost :size="'tiny'">
+            <n-button
+              type="error"
+              ghost
+              :size="'tiny'"
+              @click="handleDeletePermission(row)"
+            >
               <template #icon>
                 <n-icon><TrashAlt></TrashAlt></n-icon>
               </template>
@@ -100,11 +110,27 @@ const gridOptions = reactive<VxeGridProps<RowVO>>({
 const permissionList = ref<PermissionEntity[]>([]);
 
 async function getMenuPermission() {
-  const res = await permissionApi.getMenuPermission();
+  const res = await permissionApi.getMenuPermission(searchForm.value.name);
   console.log(res);
   permissionList.value = res;
 
   gridOptions.data = res;
+}
+
+async function handleDeletePermission(row: RowVO) {
+  window.$dialog({
+    title: '确认',
+    content: '确认删除？',
+    async onPositiveClick() {
+      const res = await permissionApi.deletePermission(row.id);
+      if (res) {
+        window.$message.success('删除成功');
+        getMenuPermission();
+      } else {
+        window.$message.warning('删除失败');
+      }
+    },
+  });
 }
 
 // ======== init ==========
