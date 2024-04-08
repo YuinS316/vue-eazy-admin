@@ -1,0 +1,27 @@
+MYSQL_CONFIG:
+  host: 'localhost'
+  port: 13306
+  user: 'eazy_admin_dev'
+  password: 'dev123456'
+  database: 'eazy_admin'
+  #  开启连接池
+  waitForConnections: true
+  connectionLimit: 10
+  idleTimeout: 60000
+  queueLimit: 0
+  enableKeepAlive: true
+  keepAliveInitialDelay: 0
+
+REDIS_CONFIG:
+  host: 'localhost'
+  port: 6379
+  # 单位是秒,默认是1day = 60 * 60 * 24
+  ttl: 86400
+
+JWT:
+  secret: 'peace and love'
+  expiresIn: '7d'
+
+SESSION:
+  secret: 'no wars'
+  name: 'no wars.name'
