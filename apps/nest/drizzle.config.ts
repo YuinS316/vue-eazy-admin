@@ -1,7 +1,10 @@
 import type { Config } from 'drizzle-kit';
 import { getConfig } from '@/utils/getConfig';
 
-const { host, port, user, password, database } = getConfig('MYSQL_CONFIG');
+const { host, port, user, password, database } = getConfig(
+  'MYSQL_CONFIG',
+  'dev',
+);
 
 export default {
   schema: './src/schema/modules/*',

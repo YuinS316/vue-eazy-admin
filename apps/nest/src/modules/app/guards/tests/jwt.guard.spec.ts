@@ -1,4 +1,5 @@
 import { ExecutionContext } from '@nestjs/common';
+import { createMock } from '@golevelup/ts-jest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { testImportModules } from '@test/helper';
 import { JwtAuthGuard } from '../jwt.guard';
@@ -29,12 +30,11 @@ function mockReqContext(token: string) {
     },
   };
 
-  // 创建一个模拟的 ExecutionContext 对象
-  const mockContext: ExecutionContext = {
+  const mockContext: ExecutionContext = createMock<ExecutionContext>({
     switchToHttp: () => ({
       getRequest: () => mockRequest,
     }),
-  } as ExecutionContext;
+  });
 
   return { context: mockContext, request: mockRequest };
 }

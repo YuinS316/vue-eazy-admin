@@ -1,8 +1,8 @@
 import { JWTPayload } from '@typings/index';
 
-export const createUser = () => {
+export const createUser = (userName?: string) => {
   return {
-    userName: 'test12345',
+    userName: userName ?? 'test12345',
     password: '123456',
   };
 };

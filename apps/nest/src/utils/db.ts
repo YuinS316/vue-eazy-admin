@@ -34,7 +34,7 @@ export async function setupDB() {
 
   class CustomDbLogWriter implements LogWriter {
     write(message: string) {
-      logger.verbose(message);
+      logger.debug(message);
     }
   }
 

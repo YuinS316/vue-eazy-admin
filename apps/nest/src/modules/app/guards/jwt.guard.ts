@@ -3,16 +3,30 @@ import { JwtService } from '@nestjs/jwt';
 import { BusinessThrownService } from '@/modules/global/providers/businessThrown.provider';
 import { BUSINESS_ERROR_CODE } from '@/constants/errCode.enum';
 import { AuthService } from '@/modules/auth/auth.service';
+import { IS_PUBLIC_KEY } from '@/modules/app/guards/jwt.decorator';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
+    private reflector: Reflector,
     private jwtService: JwtService,
     private thrownService: BusinessThrownService,
     private authService: AuthService,
   ) {}
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
+
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    // 如果标记为公开路由，则不进行JWT认证拦截
+    if (isPublic) {
+      return true;
+    }
+
     const token = this.extractTokenFromHeader(request);
 
     //  没有token，提示用户没有登陆

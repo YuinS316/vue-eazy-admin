@@ -12,6 +12,10 @@ import { join } from 'path';
 import * as dayjs from 'dayjs';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from '@/modules/app/guards/jwt.guard';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConfig } from '@/utils/jwtConfig';
+import { PermissionModule } from '@/modules/permission/permission.module';
+import { RoleModule } from '@/modules/role/role.module';
 
 @Module({
   imports: [
@@ -54,12 +58,6 @@ import { JwtAuthGuard } from '@/modules/app/guards/jwt.guard';
         ),
       ],
     }),
-    //  环境配置模块
-    // ConfigModule.forRoot({
-    //   ignoreEnvFile: true,
-    //   isGlobal: true,
-    //   load: [getConfig],
-    // }),
     //  redis模块
     RedisModule.forRootAsync({
       useFactory() {
@@ -71,11 +69,14 @@ import { JwtAuthGuard } from '@/modules/app/guards/jwt.guard';
         };
       },
     }),
+    JwtModule.registerAsync(jwtConfig()),
     //  全局共享
     GlobalModule,
     //  业务模块
     UserModule,
     AuthModule,
+    PermissionModule,
+    RoleModule,
   ],
   controllers: [],
   providers: [

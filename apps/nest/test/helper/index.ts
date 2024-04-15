@@ -24,8 +24,18 @@ export async function cleanDB(db: DBType) {
   //  关闭外键约束
   await db.execute(sql`SET FOREIGN_KEY_CHECKS = 0;`);
 
-  await db.execute(sql`TRUNCATE TABLE user;`);
-  await db.execute(sql`TRUNCATE TABLE profile;`);
+  const tableNames = [
+    'user',
+    'profile',
+    'permission',
+    'role',
+    'user_role',
+    'role_permission',
+  ];
+
+  for (const tableName of tableNames) {
+    await db.execute(sql`TRUNCATE TABLE ${sql.raw(tableName)};`);
+  }
 
   //  重新开启外键约束
   await db.execute(sql`SET FOREIGN_KEY_CHECKS = 1;`);

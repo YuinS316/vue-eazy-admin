@@ -1,4 +1,5 @@
 import { ExecutionContext } from '@nestjs/common';
+import { createMock } from '@golevelup/ts-jest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { testImportModules } from '@test/helper';
 import { LoginGuard } from '../login.guard';
@@ -27,7 +28,7 @@ async function setupTesting() {
   };
 }
 
-function mockReqBody(body: Record<string, any>) {
+function mockReqContext(body: Record<string, any>) {
   const mockRequest = {
     headers: {
       authorization: 'invalid_token',
@@ -37,11 +38,11 @@ function mockReqBody(body: Record<string, any>) {
   };
 
   // 创建一个模拟的 ExecutionContext 对象
-  const mockContext: ExecutionContext = {
+  const mockContext: ExecutionContext = createMock<ExecutionContext>({
     switchToHttp: () => ({
       getRequest: () => mockRequest,
     }),
-  } as ExecutionContext;
+  });
 
   return { context: mockContext };
 }
@@ -61,7 +62,7 @@ describe('LoginGuard', () => {
   });
 
   it('should throw exception when user is not exist', function () {
-    const { context } = mockReqBody(user);
+    const { context } = mockReqContext(user);
     expect(loginGuard.canActivate(context)).rejects.toThrow();
   });
 
@@ -74,7 +75,7 @@ describe('LoginGuard', () => {
     mockAuthService.validateUser.mockReturnValue({});
     mockAuthService.buildReqUser.mockReturnValue(mockPayload);
 
-    const { context } = mockReqBody(user);
+    const { context } = mockReqContext(user);
     expect(loginGuard.canActivate(context)).resolves.toBeTruthy();
   });
 });
